@@ -68,9 +68,9 @@
             }
         }
         public function logout(){
-            echo '您已退出，将在5s后返回首页！';
+            echo '您已退出，将在3s后返回首页！';
             $this->clean_cookies();
-            header("Refresh:5;url=/");
+            header("Refresh:3;url=/");
             exit;
         }
         //清除COOKIE
@@ -86,6 +86,29 @@
             );
             $data = json_encode($data);
             echo $data;
+        }
+        //重置密码
+        public function resetpass(){
+            //加载数据库模型
+            $this->load->model('query','',TRUE);
+            //查询站点信息
+            $siteinfo = $this->query->site_setting('1');
+            $siteinfo->title = '重置密码 - '.$siteinfo->title;
+            //查询用户信息
+            $userinfo = $this->query->userinfo()->values;
+            $userinfo = json_decode($userinfo);
+            //$userinfo = $userinfo['userinfo'];
+            $siteinfo->username = $userinfo->username;
+            //验证文件路径
+            $pass_txt = FCPATH."data/password.txt";
+            if(!file_exists($pass_txt)){
+                echo "没有权限，请参考帮助文档重置密码！";
+            }
+            else{
+                $this->load->view('user/header.php',$siteinfo);
+                $this->load->view('user/resetpass.php');
+                $this->load->view('user/footer.php');
+            }
         }
     }
 ?>

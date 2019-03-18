@@ -10,13 +10,17 @@
 // 	});
 // });
 // 这个东西没值，你拿不到
-layui.use(['upload','form','element','layer'], function(){
+layui.use(['upload','form','element','layer','flow'], function(){
 		var upload = layui.upload;
         var form = layui.form;
         var element = layui.element;
         var layer   = layui.layer;
         var storage = $('#storage input[name="storage"]:checked ').val();
-
+		//图片懒加载
+		var flow = layui.flow;
+		flow.lazyimg({
+            elem:'#found img'
+        });
         //图片查看器
         layer.photos({
             photos: '#found'
@@ -104,6 +108,10 @@ layui.use(['upload','form','element','layer'], function(){
                     //对图片进行鉴黄识别
                     identify(res.id);
                     //element.progress('up-status', col + '%');
+                }
+                else if(res.code == 0){
+                    layer.msg(res.msg);
+                    return false;
                 }
             } 
             ,error: function(index, upload){
@@ -207,4 +215,19 @@ function identify(id){
             console.log(re.code);
         }
     });
+}
+//重置密码
+function resetpass(){
+    var password1 = $("#password1").val();
+    var password2 = $("#password2").val();
+
+    if(password1 != password2){
+        layer.msg("两次密码不一致！");
+    }
+    else if(password1 == password2){
+        $.post("/deal/resetpass",{password1:password1,password2:password2},function(data,status){
+            var re = JSON.parse(data);
+            layer.msg(re.msg);
+        });
+    }
 }
